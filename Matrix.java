@@ -98,43 +98,41 @@ public class Matrix {
      * Custom Implementation of a Gaussian Elimination Algorithm. Note matrix does not need to be square.
      */
     public void gaussianElimination() throws MatrixError {
-        for(int column=0; column<this.matrix.length; column++){
-            //Check if current column is 1.
-            if(!this.matrix[column][column].equals(new Fraction(1, 1))){
-                //Find any existing ones
-                Integer oneIndex = null;
-                Integer otherIndex = null;
-                for(int i=column; i<this.matrix.length; i++) {
-                    if(this.matrix[i][column].equals(new Fraction(1,1))){
-                        if(oneIndex == null) {
-                            oneIndex=i;
-                        }
-                    }else if(!this.matrix[i][column].equals(new Fraction(0,1))) {
-                        if(otherIndex == null) {
-                            otherIndex=i;
-                        }
-                    }
+        if(this.isEmpty()){
+            throw new MatrixError("Matrix Error: Cannot solve empty matrix.");
+        }
+        int rowIndex = 0;
+        for(int columnIndex = 0; columnIndex < this.matrix[0].length; columnIndex++){
+            Integer nonZero = null;
+            Integer one = null;
+            for(int i = rowIndex; i < this.matrix.length; i++){
+                if(nonZero == null && !this.matrix[i][columnIndex].equals(new Fraction(0,1 ))){
+                    nonZero = i;
                 }
-                if(oneIndex != null) {
-                    this.rowSwap(column + 1, oneIndex + 1);
-                }else if(otherIndex != null) {
-                    this.rowSwap(column + 1, otherIndex + 1);
-                    this.rowMultiplication(new Fraction(this.matrix[column][column].denominator, this.matrix[column][column].numerator), column + 1);
-                }else {
-                    System.out.println(column+"\n");
-                    throw new MatrixError("Gaussian Elimination Error: All Zeroes Found!");
+                if(one == null && this.matrix[i][columnIndex].equals(new Fraction(1,1 ))){
+                    one = i;
                 }
             }
-            if(this.print){System.out.println(this.toString());}
-            //Substitute all zeroes below.
-            for(int i=column+1; i<this.matrix.length; i++) {
-                if(!this.matrix[i][column].equals(new Fraction(0, 1))) {
-                    Fraction oldScalar = this.matrix[i][column];
-                    this.rowMultiplication(Fraction.negate(oldScalar), column+1);
-                    this.rowAddition(column+1, i+1);
-                    this.rowMultiplication(Fraction.negate(new Fraction(oldScalar.denominator, oldScalar.numerator)), column+1);
+            if(nonZero != null){
+                if(one != null){
+                    this.rowSwap(rowIndex+1, one+1);
+                }else{
+                    this.rowMultiplication(new Fraction(this.matrix[nonZero][columnIndex].denominator, this.matrix[nonZero][columnIndex].numerator), nonZero+1);
+                    this.rowSwap(rowIndex+1, nonZero+1);
                 }
                 if(this.print){System.out.println(this.toString());}
+                for(int i = rowIndex + 1; i < this.matrix.length; i++){
+                    if(!this.matrix[i][columnIndex].equals(new Fraction(0, 1))){
+                        this.rowMultiplication(Fraction.negate(this.matrix[i][columnIndex]), rowIndex+1);
+                        this.rowAddition(rowIndex + 1, i + 1);
+                        this.rowMultiplication(new Fraction(this.matrix[rowIndex][columnIndex].denominator, this.matrix[rowIndex][columnIndex].numerator), rowIndex+1);
+                        if(this.print){System.out.println(this.toString());}
+                    }
+                }
+                rowIndex++;
+                if(rowIndex >= this.matrix.length) {
+                    break;
+                }
             }
         }
     }
@@ -160,20 +158,23 @@ public class Matrix {
             matrixError.printStackTrace();
             System.exit(0);
         }
-        for(int column=this.matrix.length-1; column>=0; column--){
-            if(this.print){System.out.println(this.toString());}
-            //Substitute all zeroes below.
-            for(int i=column-1; i>=0; i--) {
-                if(!this.matrix[i][column].equals(new Fraction(0, 1))) {
-                    Fraction oldScalar = this.matrix[i][column];
-                    this.rowMultiplication(Fraction.negate(oldScalar), column+1);
-                    this.rowAddition(column+1, i+1);
-                    this.rowMultiplication(Fraction.negate(new Fraction(oldScalar.denominator, oldScalar.numerator)), column+1);
+        int rowIndex = 0;
+        for(int columnIndex = 0; columnIndex < this.matrix[0].length; columnIndex++){
+            if(this.matrix[rowIndex][columnIndex].equals(new Fraction(1,1))) {
+                for (int i = 0; i < rowIndex; i++) {
+                    if(!this.matrix[i][columnIndex].equals(new Fraction(0, 1))){
+                        this.rowMultiplication(Fraction.negate(this.matrix[i][columnIndex]), rowIndex + 1);
+                        this.rowAddition(rowIndex + 1, i + 1);
+                        this.rowMultiplication(new Fraction(this.matrix[rowIndex][columnIndex].denominator, this.matrix[rowIndex][columnIndex].numerator), rowIndex + 1);
+                        if (this.print) {System.out.println(this.toString());}
+                    }
                 }
-                if(this.print){System.out.println(this.toString());}
+                rowIndex++;
+                if(rowIndex >= this.matrix.length) {
+                    break;
+                }
             }
         }
-        System.out.println(this);
     }
 
     public Fraction determinant() throws MatrixError{
@@ -231,6 +232,17 @@ public class Matrix {
     }
 
     public boolean isSquare(){return this.matrix.length==this.matrix[0].length;}
+
+    public boolean isEmpty() {
+        if(this.matrix.length == 0){
+            return true;
+        }else{
+            if(this.matrix[0].length == 0){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static Matrix add(Matrix matrix1, Matrix matrix2) throws MatrixError{
         if(matrix1.matrix.length != matrix2.matrix.length || matrix1.matrix[0].length != matrix2.matrix[0].length){

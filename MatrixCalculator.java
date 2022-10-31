@@ -1,5 +1,7 @@
 package com.saptakdas.misc.MatrixCalculator;
 
+import com.saptakdas.util.Menu;
+
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -16,7 +18,7 @@ public class MatrixCalculator {
         while(true){
             int choice = 1;
             if(notNull) {
-                choice=Menu.choice("Operation: \n1: Enter/Update a Matrix\n2: Find Determinant of a Matrix\n3: Matrix Math\n4: Quit Calculator", 4);
+                choice= Menu.choice("Operation: \n1: Enter/Update a Matrix\n2: Find Determinant of a Matrix\n3: Matrix Math\n4: Quit Calculator", 4);
             }else{
                 System.out.println("Enter a new Matrix to start using the Matrix Calculator.");
             }

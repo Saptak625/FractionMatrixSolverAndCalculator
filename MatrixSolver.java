@@ -1,6 +1,7 @@
 package com.saptakdas.misc.MatrixCalculator;
 
-import java.util.Arrays;
+import com.saptakdas.util.Menu;
+
 import java.util.Scanner;
 
 public class MatrixSolver {
@@ -14,7 +15,7 @@ public class MatrixSolver {
         this.dimension1 = this.matrix.matrix.length;
         this.dimension2 = this.matrix.matrix[0].length;
         //Ask for solving method
-        int choice=Menu.choice("1: Gaussian Elimination with Back Substitution\n2: Gauss-Jordan Elimination\n3: Matrix Equations\n4: Cramer's Rule", 4);
+        int choice= Menu.choice("1: Gaussian Elimination with Back Substitution\n2: Gauss-Jordan Elimination\n3: Matrix Equations\n4: Cramer's Rule", 4);
         if (choice == 1) {
             this.matrix.gaussianWithBackSubstitution();
             System.out.println("Solution: ");
